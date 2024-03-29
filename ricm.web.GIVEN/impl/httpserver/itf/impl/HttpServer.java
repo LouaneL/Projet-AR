@@ -73,7 +73,7 @@ public class HttpServer {
 		if (method.equals("GET")) {
 			request = new HttpStaticRequest(this, method, ressname);
 		} else if (method.equals("POST")) {
-			request = new HttpRicmletRequestImpl(null, method, ressname, br)
+			request = new HttpRicmletRequestImpl(null, method, ressname, br);
 		} else 
 			request = new UnknownRequest(this, method, ressname);
 		return request;
