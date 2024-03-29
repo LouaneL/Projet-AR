@@ -12,6 +12,7 @@ import java.util.StringTokenizer;
 import httpserver.itf.HttpRequest;
 import httpserver.itf.HttpResponse;
 import httpserver.itf.HttpRicmlet;
+import httpserver.itf.HttpRicmletRequest;
 
 
 /**
@@ -71,6 +72,8 @@ public class HttpServer {
 		String ressname = parseline.nextToken();
 		if (method.equals("GET")) {
 			request = new HttpStaticRequest(this, method, ressname);
+		} else if (method.equals("POST")) {
+			request = new HttpRicmletRequestImpl(null, method, ressname, br)
 		} else 
 			request = new UnknownRequest(this, method, ressname);
 		return request;

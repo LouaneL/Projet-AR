@@ -16,7 +16,7 @@ import httpserver.itf.HttpResponse;
  */
 public class HttpStaticRequest extends HttpRequest {
 	static final String DEFAULT_FILE = "index.html";
-	static final String PATH_TO_FILE_DIR = "./FILES";
+	static final String PATH_TO_FILE_DIR = ".";
 
 	public HttpStaticRequest(HttpServer hs, String method, String ressname) throws IOException {
 		super(hs, method, ressname);
@@ -25,7 +25,7 @@ public class HttpStaticRequest extends HttpRequest {
 	public void process(HttpResponse resp) throws Exception {
 		String ressname = this.getRessname();
 		System.out.println(ressname);
-		if (ressname.equals("/")) {
+		if (ressname.equals("/FILES/")) {
 			ressname = ressname + DEFAULT_FILE;
 		}
 		
