@@ -39,7 +39,7 @@ public class HttpRicmletResponseImpl implements HttpRicmletResponse {
 
 	@Override
 	public void setContentLength(int length) throws IOException {
-		m_ps.println("Content-length: " + length);
+		m_ps.println("Content-length: " + length); 
 	}
 
 	@Override

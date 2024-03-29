@@ -16,7 +16,6 @@ import httpserver.itf.HttpResponse;
  */
 public class HttpStaticRequest extends HttpRequest {
 	static final String DEFAULT_FILE = "index.html";
-	static final String PATH_TO_FILE_DIR = ".";
 
 	public HttpStaticRequest(HttpServer hs, String method, String ressname) throws IOException {
 		super(hs, method, ressname);
@@ -33,7 +32,7 @@ public class HttpStaticRequest extends HttpRequest {
 		FileInputStream fis = null;
 		try {
 			// Open la ressource à partir du dossier FILES avec le IO
-			fis = new FileInputStream(PATH_TO_FILE_DIR + ressname);
+			fis = new FileInputStream(m_hs.getFolder() + ressname);
 			InputStreamReader isr = new InputStreamReader(fis);
 			br = new BufferedReader(isr);
 		} catch (FileNotFoundException e) {

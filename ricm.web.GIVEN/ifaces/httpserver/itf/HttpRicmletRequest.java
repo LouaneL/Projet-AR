@@ -10,9 +10,18 @@ import httpserver.itf.impl.HttpServer;
  * A dynamic HTTP request involves an ricmlet
  */
 public abstract class HttpRicmletRequest extends HttpRequest {
-	
+	BufferedReader br;
 	public HttpRicmletRequest(HttpServer hs, String method, String ressname, BufferedReader br) throws IOException {
-		super(hs,method,ressname);
+		super(hs,method,ressname); 
+		this.br = br;
+	}
+
+	/*
+	 * Returns the BufferedReader object attached to the current client
+	 * used to read the cookies 
+	 */
+	public BufferedReader getBr() {
+		return br;
 	}
 
 	/*

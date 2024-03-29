@@ -7,12 +7,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import httpserver.itf.HttpRequest;
 import httpserver.itf.HttpResponse;
 import httpserver.itf.HttpRicmlet;
-import httpserver.itf.HttpRicmletRequest;
 
 
 /**
@@ -30,6 +30,8 @@ public class HttpServer {
 	private int m_port;
 	private File m_folder;  // default folder for accessing static resources (files)
 	private ServerSocket m_ssoc;
+	// Hashmap des instances de ricmlets
+	private HashMap<String, HttpRicmlet> m_ricmlets = new HashMap<String, HttpRicmlet>();
 
 	protected HttpServer(int port, String folderName) {
 		m_port = port;
@@ -54,7 +56,14 @@ public class HttpServer {
 	public HttpRicmlet getInstance(String clsname)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException, MalformedURLException, 
 			IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-		throw new Error("No Support for Ricmlets");
+		
+		HttpRicmlet ricmlet = m_ricmlets.get(clsname);
+		if (ricmlet == null) {
+			Class<?> clas = Class.forName(clsname);
+			ricmlet = (HttpRicmlet) clas.getDeclaredConstructor().newInstance();
+			m_ricmlets.put(clsname, ricmlet);
+		}
+		return ricmlet;
 	}
 
 
@@ -77,12 +86,11 @@ public class HttpServer {
 		return request;
 	}
 
-
 	/*
 	 * Returns an HttpResponse object associated to the given HttpRequest object
 	 */
 	public HttpResponse getResponse(HttpRequest req, PrintStream ps) {
-		return new HttpResponseImpl(this, req, ps);
+		return new HttpRicmletResponseImpl(this, req, ps);
 	}
 
 
