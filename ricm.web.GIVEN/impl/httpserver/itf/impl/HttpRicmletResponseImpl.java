@@ -55,8 +55,7 @@ public class HttpRicmletResponseImpl implements HttpRicmletResponse {
 
 	@Override
 	public void setCookie(String name, String value) {
-		// TODO Auto-generated method stub
-
+		m_ps.println("Set-Cookie: " + name + "=" + value);
 	}
 
 }

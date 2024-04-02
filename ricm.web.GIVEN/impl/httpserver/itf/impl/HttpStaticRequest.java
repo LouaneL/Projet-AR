@@ -39,7 +39,7 @@ public class HttpStaticRequest extends HttpRequest {
 		resp.setContentType(getContentType(m_ressname));
 
 		PrintStream ps = resp.beginBody();
-		ps.writeBytes(fis.readAllBytes());
+		ps.write(fis.readAllBytes());
 		fis.close();
 	}
 
