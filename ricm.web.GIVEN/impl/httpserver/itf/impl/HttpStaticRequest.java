@@ -1,11 +1,8 @@
 package httpserver.itf.impl;
 
-import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 
 import httpserver.itf.HttpRequest;
@@ -19,22 +16,18 @@ public class HttpStaticRequest extends HttpRequest {
 
 	public HttpStaticRequest(HttpServer hs, String method, String ressname) throws IOException {
 		super(hs, method, ressname);
+		if (ressname.endsWith("/")) { // if the ressource is a directory
+			
+			m_ressname = ressname + DEFAULT_FILE;
+			
+		} 
 	}
 
 	public void process(HttpResponse resp) throws Exception {
-		String ressname = this.getRessname();
-		System.out.println(ressname);
-		if (ressname.equals("/FILES/")) {
-			ressname = ressname + DEFAULT_FILE;
-		}
-		
-		BufferedReader br = null;
 		FileInputStream fis = null;
 		try {
 			// Open la ressource à partir du dossier FILES avec le IO
-			fis = new FileInputStream(m_hs.getFolder() + ressname);
-			InputStreamReader isr = new InputStreamReader(fis);
-			br = new BufferedReader(isr);
+			fis = new FileInputStream(m_hs.getFolder() + m_ressname);
 		} catch (FileNotFoundException e) {
 			// close stream
 			resp.setReplyError(404, "Not Found");		
@@ -42,33 +35,11 @@ public class HttpStaticRequest extends HttpRequest {
 		}
 
 		resp.setReplyOk();
-		resp.setContentType(getContentType(ressname));
+		resp.setContentLength(fis.available());
+		resp.setContentType(getContentType(m_ressname));
 
-		
-		if (getContentType(ressname).contains("text")) {
-			String line = br.readLine();
-			String content = "";
-			while (line != null) {
-				content += line;
-				line = br.readLine();
-			}
-
-			resp.setContentLength(content.length());
-			PrintStream pt = resp.beginBody();
-			pt.print(content);
-
-		} else {
-			resp.setContentLength(fis.available());
-			PrintStream pt = resp.beginBody();
-			byte[] buffer = new byte[1024];
-			int nbRead;
-			while ((nbRead = fis.read(buffer)) != -1) {
-				pt.write(buffer, 0, nbRead);
-			}
-		}
-
-		// close stream
-		br.close();
+		PrintStream ps = resp.beginBody();
+		ps.writeBytes(fis.readAllBytes());
 		fis.close();
 	}
 

@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 
 import httpserver.itf.HttpResponse;
@@ -29,7 +28,11 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest {
 
 	public HttpRicmletRequestImpl(HttpServer hs, String method, String ressname, BufferedReader br) throws IOException {
 		super(hs, method, ressname, br);
-		System.out.println(ressname);
+		if (ressname.endsWith("/")) { // if the ressource is a directory
+			
+			m_ressname = ressname + DEFAULT_FILE;
+			
+		} 
 	}
 
 	@Override
@@ -59,24 +62,21 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest {
 
 	@Override
 	public void process(HttpResponse resp) throws Exception {
-		String ressname = this.getRessname();
-		if (ressname.endsWith("/")) { // if the ressource is a directory
-			ressname = ressname + DEFAULT_FILE;
-		} else if (ressname.startsWith(RICMLETS_PATH)) { // if the ressource is a ricmlet
+		 if (m_ressname.startsWith(RICMLETS_PATH)) { // if the ressource is a ricmlet
+			
 			// En changeant les / en . on obtient le nom de la classe
-			String ressnameWithoutRicmlets = ressname.substring(RICMLETS_PATH.length());
+			String ressnameWithoutRicmlets = m_ressname.substring(RICMLETS_PATH.length());
 			String ressnameBeforeSplit = ressnameWithoutRicmlets.split("\\?")[0];
 			String clasname = ressnameBeforeSplit.replace( "/", ".");
 			HttpRicmlet myRicmlet = m_hs.getInstance(clasname);
 			myRicmlet.doGet(this, (HttpRicmletResponse) resp);
+			
 		} else {
-			BufferedReader br = null;
+			
 			FileInputStream fis = null;
 			try {
 				// Open la ressource à partir du dossier FILES avec le IO
-				fis = new FileInputStream(m_hs.getFolder() + ressname);
-				InputStreamReader isr = new InputStreamReader(fis);
-				br = new BufferedReader(isr);
+				fis = new FileInputStream(m_hs.getFolder() + m_ressname);
 			} catch (FileNotFoundException e) {
 				// close stream
 				resp.setReplyError(404, "Not Found");		
@@ -84,37 +84,13 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest {
 			}
 
 			resp.setReplyOk();
-			resp.setContentType(getContentType(ressname));
-
-
-			if (getContentType(ressname).contains("text")) {
-				String line = br.readLine();
-				String content = "";
-				while (line != null) {
-					content += line;
-					line = br.readLine();
-				}
-
-				resp.setContentLength(content.length());
-				PrintStream pt = resp.beginBody();
-				pt.print(content);
-
-			} else {
-				resp.setContentLength(fis.available());
-				PrintStream pt = resp.beginBody();
-				byte[] buffer = new byte[1024];
-				int nbRead;
-				while ((nbRead = fis.read(buffer)) != -1) {
-					pt.write(buffer, 0, nbRead);
-				}
-			}
-
-			// close stream
-			br.close();
+			resp.setContentLength(fis.available());
+			resp.setContentType(getContentType(m_ressname));
+			
+			PrintStream ps = resp.beginBody();
+            ps.writeBytes(fis.readAllBytes());
 			fis.close();
 		}
-
-
 	}
 
 }
