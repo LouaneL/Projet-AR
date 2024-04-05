@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.UUID;
 
 import httpserver.itf.HttpRequest;
 import httpserver.itf.HttpRicmletResponse;
@@ -29,6 +30,11 @@ public class HttpRicmletResponseImpl implements HttpRicmletResponse {
 		for (String nameCookie : cookies.keySet()) {
 			m_ps.println("Set-Cookie: " + nameCookie + "=" + cookies.get(nameCookie));
 		}
+		
+		// Création de l'id de la Session
+		String session_id = ((HttpRicmletRequestImpl) m_req).getCookie("session-id");
+		m_ps.println("Set-Cookie: " + "session-id" + "=" + session_id);
+
 		m_ps.println("Server: ricm-http 1.0");
 	}
 

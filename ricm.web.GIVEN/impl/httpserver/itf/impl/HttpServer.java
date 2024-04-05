@@ -13,6 +13,7 @@ import java.util.StringTokenizer;
 import httpserver.itf.HttpRequest;
 import httpserver.itf.HttpResponse;
 import httpserver.itf.HttpRicmlet;
+import httpserver.itf.HttpSession;
 
 
 /**
@@ -31,8 +32,10 @@ public class HttpServer {
 	private File m_folder;  // default folder for accessing static resources (files)
 	private ServerSocket m_ssoc;
 	// Hashmap des instances de ricmlets
-	private HashMap<String, HttpRicmlet> m_ricmlets = new HashMap<String, HttpRicmlet>();
-
+	private HashMap<String, HttpRicmlet> m_ricmlets = new HashMap<>();
+	private HashMap<String,HttpSession> m_session = new HashMap<>();
+	
+	
 	protected HttpServer(int port, String folderName) {
 		m_port = port;
 		if (!folderName.endsWith(File.separator)) 
@@ -44,6 +47,23 @@ public class HttpServer {
 		} catch (IOException e) {
 			System.out.println("HttpServer Exception:" + e );
 			System.exit(1);
+		}
+	}
+	
+	public HttpSession getSession(String idUser) {
+		HttpSession session = m_session.get(idUser);
+		if (session == null) {
+			session = new Session(idUser,this);
+			m_session.put(idUser, session);
+		}
+		return session;
+	}
+	
+	public void removeSession(HttpSession session) {
+		for (String idUser : m_session.keySet()) {
+			if (m_session.get(idUser).equals(session)) {
+				m_session.remove(idUser,session);
+			}
 		}
 	}
 	

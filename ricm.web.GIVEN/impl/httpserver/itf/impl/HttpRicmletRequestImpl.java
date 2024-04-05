@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.UUID;
 
 import httpserver.itf.HttpResponse;
 import httpserver.itf.HttpRicmlet;
@@ -43,7 +44,6 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest {
 		try {
 			String line = m_br.readLine();
 			while (!line.equals("")) {
-				System.out.println(line);
 				if (line.startsWith("Cookie: ")) {
 					String[] newCookies = line.split(": ")[1].split("; ");
 					for (String cookie : newCookies) {
@@ -59,9 +59,9 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest {
 	}
 
 	@Override
-	public HttpSession getSession() {
-		// TODO Auto-generated method stub
-		return null;
+	public HttpSession getSession() {		
+		String session_id = getCookie("session-id");
+		return m_hs.getSession(session_id);
 	}
 
 	@Override
@@ -80,7 +80,11 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest {
 
 	@Override
 	public String getCookie(String name) { 
-		return cookies.containsKey(name) ? cookies.get(name):"";
+		if (name == "session-id" && !cookies.containsKey("session-id")) {
+			String session_id = UUID.randomUUID().toString();
+			cookies.put("session-id", session_id);
+		}
+		return cookies.get(name);
 	}
 
 	@Override
