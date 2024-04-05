@@ -18,10 +18,10 @@ public class CookieRicmlet implements httpserver.itf.HttpRicmlet{
 			resp.setCookie("MyFirstCookie", "1");
 		else {
 			int n =  Integer.valueOf(myFirstCookie);
-				// modify the cookie's value each time the ricmlet is invoked
-				resp.setCookie("MyFirstCookie", new Integer(n+1).toString());
+			// modify the cookie's value each time the ricmlet is invoked
+			resp.setCookie("MyFirstCookie", new Integer(n+1).toString());
 		}
-	
+
 		resp.setReplyOk();
 		resp.setContentType("text/html");
 		PrintStream ps = resp.beginBody();
@@ -29,5 +29,5 @@ public class CookieRicmlet implements httpserver.itf.HttpRicmlet{
 		ps.print("<BODY><H4> MyFirstCookie " + req.getCookie("MyFirstCookie") + "<br>");
 		ps.println("</H4></BODY></HTML>");
 		ps.println();
-}
+	}
 }

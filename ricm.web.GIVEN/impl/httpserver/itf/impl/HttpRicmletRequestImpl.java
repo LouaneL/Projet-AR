@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashMap;
 
 import httpserver.itf.HttpResponse;
 import httpserver.itf.HttpRicmlet;
@@ -27,14 +28,34 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest {
 
 	static final String DEFAULT_FILE = "index.html";
 	static final String RICMLETS_PATH = "/ricmlets/";
+	HashMap<String, String> cookies;
 
 	public HttpRicmletRequestImpl(HttpServer hs, String method, String ressname, BufferedReader br) throws IOException {
 		super(hs, method, ressname, br);
+		cookies = new HashMap<>();
 		if (ressname.endsWith("/")) { // if the ressource is a directory
-
 			m_ressname = ressname + DEFAULT_FILE;
+		}
+		setupCookies();
+	}
 
-		} 
+	private void setupCookies() {
+		try {
+			String line = m_br.readLine();
+			while (!line.equals("")) {
+				System.out.println(line);
+				if (line.startsWith("Cookie: ")) {
+					String[] newCookies = line.split(": ")[1].split("; ");
+					for (String cookie : newCookies) {
+						String[] cookieSplit = cookie.split("=");
+						cookies.put(cookieSplit[0], cookieSplit[1]);
+					}
+				}
+				line = m_br.readLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -46,6 +67,7 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest {
 	@Override
 	public String getArg(String name) {
 		String[] ressnameWithoutRicmlets = this.getRessname().split("\\?");
+		if (ressnameWithoutRicmlets.length == 1) return "";
 		String[] args = ressnameWithoutRicmlets[1].split("&");
 		for (String arg : args) {
 			String[] argSplit = arg.split("=");
@@ -58,19 +80,7 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest {
 
 	@Override
 	public String getCookie(String name) { 
-		try {
-			String cookie = m_br.readLine();
-			while (cookie != null) {
-				String[] cookieSplit = cookie.split("=");
-				if (cookieSplit[0].equals(name)) {
-					return (cookieSplit.length == 1) ? "" : cookieSplit[1];
-				}
-				cookie = m_br.readLine();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
+		return cookies.containsKey(name) ? cookies.get(name):"";
 	}
 
 	@Override
@@ -107,77 +117,4 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest {
 			fis.close();
 		}
 	}
-
-
-	private void updateCookie() {
-		try {
-			String line = m_br.readLine();
-			while (line != null) {
-				if (line.startsWith("Set-Cookie: ")) {
-					String[] cookies = line.split(": ")[1].split(";");
-					for (String cookie : cookies) {
-						String[] cookieSplit = cookie.split("=");
-						if (cookieSplit.length == 2) {
-							addCookie(cookieSplit[0], cookieSplit[1]);
-						} else {
-							removeCookie(cookieSplit[0]);
-						}
-					}
-				}
-				line = m_br.readLine();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Add a cookie to the cookies.txt file
-	 * 
-	 * @param name
-	 * @param value
-	 */
-	private void addCookie(String name, String value) {
-		// Ouvrir le fichier de cookie et ajouter le cookie
-		// Lire toute les lignes du fichier
-		// Si le cookie existe déjà, le remplacer
-		// Sinon ajouter le cookie à la fin 
-		File file = new File(m_hs.getFolder().toString() + "/cookies.txt");
-		String cookie = name + "=" + value;
-		try {
-			FileWriter fw = new FileWriter(file);
-			String line = m_br.readLine();
-			boolean cookieExist = false;
-			while (line != null) {
-				if (line.startsWith(name)) {
-					fw.write(cookie + "\n");
-					cookieExist = true;
-				} else {
-					fw.write(line + "\n");
-				}
-				line = m_br.readLine();
-			}
-			if (!cookieExist)
-				fw.write(cookie + "\n");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void removeCookie(String name) {
-		File file = new File(m_hs.getFolder().toString() + "/cookies.txt");
-		try {
-			FileWriter fw = new FileWriter(file, true);
-			String line = m_br.readLine();
-			while (line != null) {
-				if (!line.startsWith(name)) {
-					fw.write(line + "\n");
-				}
-				line = m_br.readLine();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 }
