@@ -1,13 +1,11 @@
 package httpserver.itf.impl;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.UUID;
 
 import httpserver.itf.HttpResponse;
@@ -29,15 +27,28 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest {
 
 	static final String DEFAULT_FILE = "index.html";
 	static final String RICMLETS_PATH = "/ricmlets/";
-	HashMap<String, String> cookies;
+	Hashtable<String, String> cookies;
+	Hashtable<String, String> args;
 
 	public HttpRicmletRequestImpl(HttpServer hs, String method, String ressname, BufferedReader br) throws IOException {
 		super(hs, method, ressname, br);
-		cookies = new HashMap<>();
+		cookies = new Hashtable<>();
+		args = new Hashtable<>();
 		if (ressname.endsWith("/")) { // if the ressource is a directory
 			m_ressname = ressname + DEFAULT_FILE;
 		}
+		setupArgs();
 		setupCookies();
+	}
+	
+	private void setupArgs(){
+		String[] ressnameWithoutRicmlets = this.getRessname().split("\\?");
+		if (ressnameWithoutRicmlets.length == 1) return;
+		String[] args = ressnameWithoutRicmlets[1].split("&");
+		for (String arg : args) {
+			String[] argSplit = arg.split("=");
+			this.args.put(argSplit[0],argSplit[1]);
+		}
 	}
 
 	private void setupCookies() {
@@ -66,16 +77,7 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest {
 
 	@Override
 	public String getArg(String name) {
-		String[] ressnameWithoutRicmlets = this.getRessname().split("\\?");
-		if (ressnameWithoutRicmlets.length == 1) return "";
-		String[] args = ressnameWithoutRicmlets[1].split("&");
-		for (String arg : args) {
-			String[] argSplit = arg.split("=");
-			if (argSplit[0].equals(name)) {
-				return (argSplit.length == 1) ? "" : argSplit[1];
-			}
-		}
-		return null;
+		return args.get(name);
 	}
 
 	@Override
@@ -84,6 +86,7 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest {
 			String session_id = UUID.randomUUID().toString();
 			cookies.put("session-id", session_id);
 		}
+		System.out.println(cookies.get(name));
 		return cookies.get(name);
 	}
 

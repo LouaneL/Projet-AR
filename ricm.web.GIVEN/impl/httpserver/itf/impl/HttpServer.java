@@ -7,7 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.StringTokenizer;
 
 import httpserver.itf.HttpRequest;
@@ -32,8 +32,8 @@ public class HttpServer {
 	private File m_folder;  // default folder for accessing static resources (files)
 	private ServerSocket m_ssoc;
 	// Hashmap des instances de ricmlets
-	private HashMap<String, HttpRicmlet> m_ricmlets = new HashMap<>();
-	private HashMap<String,HttpSession> m_session = new HashMap<>();
+	private Hashtable<String, HttpRicmlet> m_ricmlets = new Hashtable<>();
+	private Hashtable<String,HttpSession> m_session = new Hashtable<>();
 	
 	
 	protected HttpServer(int port, String folderName) {
@@ -59,12 +59,8 @@ public class HttpServer {
 		return session;
 	}
 	
-	public void removeSession(HttpSession session) {
-		for (String idUser : m_session.keySet()) {
-			if (m_session.get(idUser).equals(session)) {
-				m_session.remove(idUser,session);
-			}
-		}
+	public void removeSession(String idUser) {
+		m_session.remove(idUser);
 	}
 	
 	public File getFolder() {

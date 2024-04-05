@@ -18,10 +18,12 @@ public class Session implements HttpSession {
 		m_id = id;
 		userValue = new HashMap<>();
 		m_server = server;
-		initClock();
+		clock = new Timer();
+		clock.schedule(new RemoveSession(this), TIME_BEFORE_DESTRUCTION);
 	}
 	
-	private void initClock() {
+	private void reinitClock() {
+		clock.cancel();
 		clock = new Timer();
 		clock.schedule(new RemoveSession(this), TIME_BEFORE_DESTRUCTION);
 	}
@@ -33,7 +35,7 @@ public class Session implements HttpSession {
 
 	@Override
 	public Object getValue(String key) {
-		initClock();
+		reinitClock();
 		return userValue.get(key);
 	}
 
@@ -42,7 +44,7 @@ public class Session implements HttpSession {
 		userValue.put(key, value);
 	}
 	
-	class RemoveSession extends TimerTask {
+	private class RemoveSession extends TimerTask {
 		
 		Session m_s;
 		public RemoveSession(Session s) {
@@ -51,7 +53,7 @@ public class Session implements HttpSession {
 		
 		@Override
 		public void run() {
-			m_s.m_server.removeSession(m_s);
+			m_s.m_server.removeSession(m_s.m_id);
 		}
 		
 	}

@@ -3,8 +3,7 @@ package httpserver.itf.impl;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.Hashtable;
 
 import httpserver.itf.HttpRequest;
 import httpserver.itf.HttpRicmletResponse;
@@ -13,14 +12,14 @@ public class HttpRicmletResponseImpl implements HttpRicmletResponse {
 	protected HttpServer m_hs;
 	protected PrintStream m_ps;
 	protected HttpRequest m_req;
-	HashMap<String, String> cookies;
+	Hashtable<String, String> cookies;
 
 	
 	protected HttpRicmletResponseImpl(HttpServer hs, HttpRequest req, PrintStream ps) {
 		m_hs = hs;
 		m_req = req;
 		m_ps = ps;
-		cookies = new HashMap<>();
+		cookies = new Hashtable<>();
 	}
 	
 	@Override
