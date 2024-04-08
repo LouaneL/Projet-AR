@@ -27,6 +27,17 @@ import httpserver.itf.HttpSession;
  *    ...
  */
 public class HttpServer {
+	
+	/**
+	 * http://localhost:4050/FILES/
+	 * http://localhost:4050/FILES/ski.jpg
+	 * http://localhost:4050/FILES/hello.html
+	 * http://localhost:4050/ricmlets/examples/CookieRicmlet
+	 * http://localhost:4050/ricmlets/examples/HelloRicmlet
+	 * http://localhost:4050/ricmlets/examples/HelloRicmlet?name=louane&surname=lesur
+	 * http://localhost:4050/ricmlets/examples/CountBySessionRicmlet
+	 * 
+	 */
 
 	private int m_port;
 	private File m_folder;  // default folder for accessing static resources (files)
