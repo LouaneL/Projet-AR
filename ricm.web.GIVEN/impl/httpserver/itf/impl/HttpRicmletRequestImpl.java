@@ -104,6 +104,7 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest {
 			FileInputStream fis = null;
 			try {
 				// Open la ressource à partir du dossier FILES avec le IO
+				System.out.println(m_hs.getFolder().toString() + m_ressname);
 				fis = new FileInputStream(m_hs.getFolder().toString() + m_ressname);
 			} catch (FileNotFoundException e) {
 				// close stream

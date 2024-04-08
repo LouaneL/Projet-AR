@@ -36,11 +36,12 @@ public class Session implements HttpSession {
 	@Override
 	public Object getValue(String key) {
 		reinitClock();
-		return userValue.get(key);
+		return userValue.get(key);		
 	}
 
 	@Override
 	public void setValue(String key, Object value) {
+		reinitClock();
 		userValue.put(key, value);
 	}
 	
