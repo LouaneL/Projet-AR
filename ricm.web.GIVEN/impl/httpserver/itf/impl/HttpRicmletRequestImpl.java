@@ -39,6 +39,10 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest {
 		}
 		setupArgs();
 		setupCookies();
+		if (!cookies.containsKey("session-id")) {
+			String session_id = UUID.randomUUID().toString();
+			cookies.put("session-id", session_id);
+		}
 	}
 	
 	private void setupArgs(){
@@ -82,11 +86,6 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest {
 
 	@Override
 	public String getCookie(String name) { 
-		if (name == "session-id" && !cookies.containsKey("session-id")) {
-			String session_id = UUID.randomUUID().toString();
-			cookies.put("session-id", session_id);
-		}
-		System.out.println(cookies.get(name));
 		return cookies.get(name);
 	}
 
@@ -102,12 +101,10 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest {
 			myRicmlet.doGet(this, (HttpRicmletResponse) resp);
 			return;
 		} else {
-
 			FileInputStream fis = null;
 			try {
 				// Open la ressource à partir du dossier FILES avec le IO
 				fis = new FileInputStream(m_hs.getFolder().toString() + m_ressname);
-				System.out.println(m_hs.getFolder().toString() + m_ressname);
 			} catch (FileNotFoundException e) {
 				// close stream
 				resp.setReplyError(404, "Not Found");		
