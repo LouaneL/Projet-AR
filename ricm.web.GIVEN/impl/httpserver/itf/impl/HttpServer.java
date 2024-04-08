@@ -61,7 +61,7 @@ public class HttpServer {
 		}
 	}
 	
-	public HttpSession getSession(String idUser) {
+	public HttpSession getSession(String idUser){
 		HttpSession session = m_session.get(idUser);
 		if (session == null) {
 			session = new Session(idUser,this);
@@ -80,7 +80,7 @@ public class HttpServer {
 	
 	
 
-	public HttpRicmlet getInstance(String clsname)
+	public synchronized HttpRicmlet getInstance(String clsname)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException, MalformedURLException, 
 			IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		
